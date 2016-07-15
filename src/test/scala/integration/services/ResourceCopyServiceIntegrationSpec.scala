@@ -33,6 +33,7 @@ class ResourceCopyServiceIntegrationSpec extends Specification with BeforeAfterA
   override def beforeAll(): Unit = {
     val tmpDirectory = new File("target/tmp")
     if(!tmpDirectory.exists()) tmpDirectory.mkdir()
+    else tmpDirectory.listFiles().map(_.delete())
   }
 
   override def afterAll(): Unit = {
