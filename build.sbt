@@ -10,5 +10,6 @@ val sfd = project.in(file("."))
     name := "SimpleFileDownloader",
     version := "1.0.0",
     scalaVersion := "2.11.8",
-    libraryDependencies ++= libraries
+    libraryDependencies ++= libraries,
+    parallelExecution in Test := false
   )
