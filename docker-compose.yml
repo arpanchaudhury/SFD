@@ -1,0 +1,9 @@
+version: '2'
+services:
+  application:
+    image: arpanchaudhury/scala-sbt:latest
+    volumes:
+      - .:/root/code
+      - ~/.ivy2:/root/.ivy2
+    working_dir: /root/code
+    command: "sbt ';clean;compile;run'"

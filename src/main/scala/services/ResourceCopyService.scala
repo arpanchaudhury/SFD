@@ -20,7 +20,7 @@ class ResourceCopyService(resourceUrlParser: ResourceUrlParser) {
         throw IllegalDestinationDirectoryException(s"$path is not a directory.")
       }
       else {
-        resourceDestinationDirectory.mkdir()
+        resourceDestinationDirectory.mkdirs()
         resources.map(resourceUrlParser.parse).map(_.write(path))
       }
     Future.traverse(status)(_ => Future("done"))

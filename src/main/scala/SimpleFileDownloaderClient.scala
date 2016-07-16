@@ -19,6 +19,6 @@ object SimpleFileDownloaderClient extends App {
 
     Await.result(process, Duration.Inf)
 
-    println("files resources successfully downloaded...")
+    stdIO.printExitMessage()
   }
 }
