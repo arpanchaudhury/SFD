@@ -4,7 +4,6 @@ import java.io.{BufferedInputStream, File, FileInputStream}
 import java.net.InetSocketAddress
 
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
-import org.apache.sshd.SshServer
 import org.mockftpserver.fake.filesystem.{DirectoryEntry, FileEntry, UnixFakeFileSystem}
 import org.mockftpserver.fake.{FakeFtpServer, UserAccount}
 import org.specs2.mutable.Specification
@@ -13,7 +12,6 @@ import org.specs2.specification.BeforeAfterAll
 class ResourceIntegrationSpec extends Specification with BeforeAfterAll {
   val fakeHttpServer = HttpServer.create(new InetSocketAddress(20000), 0)
   val fakeFtpServer = new FakeFtpServer()
-  val fakeSftpServer = SshServer.setUpDefaultServer()
   val fileSystem = new UnixFakeFileSystem()
   val account = new UserAccount("user", "password", "/")
 
