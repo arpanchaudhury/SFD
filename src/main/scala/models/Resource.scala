@@ -53,6 +53,7 @@ case class FtpFileResource(url: String) extends Resource {
         outputStream.close()
         ftpClient.disconnect()
       } else {
+        ftpClient.disconnect()
         throw IncorrectCredentialsException("[Error]: Incorrect username and password")
       }
     } recover {
@@ -76,6 +77,11 @@ case class FtpFileResource(url: String) extends Resource {
   }
 }
 
+case class SftpFileResource(url: String) extends Resource {
+
+  override def write(path: String): Future[Any] = ???
+}
+
 case class HttpFileResource(url: String) extends Resource {
 
   override def write(path: String): Future[Any] = {
@@ -88,8 +94,4 @@ case class HttpFileResource(url: String) extends Resource {
         if (file.exists) file.delete()
     }
   }
-}
-
-case class SftpFileResource(url: String) extends Resource {
-  override def write(path: String): Future[Any] = ???
 }

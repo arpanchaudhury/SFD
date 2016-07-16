@@ -1,24 +1,29 @@
 package integration.models
 
-import java.io.File
+import java.io.{BufferedInputStream, File, FileInputStream}
+import java.net.InetSocketAddress
 
+import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
+import org.apache.sshd.SshServer
 import org.mockftpserver.fake.filesystem.{DirectoryEntry, FileEntry, UnixFakeFileSystem}
 import org.mockftpserver.fake.{FakeFtpServer, UserAccount}
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeAfterAll
 
 class ResourceIntegrationSpec extends Specification with BeforeAfterAll {
+  val fakeHttpServer = HttpServer.create(new InetSocketAddress(20000), 0)
   val fakeFtpServer = new FakeFtpServer()
+  val fakeSftpServer = SshServer.setUpDefaultServer()
   val fileSystem = new UnixFakeFileSystem()
   val account = new UserAccount("user", "password", "/")
 
   "HTTP Resource" >> {
 
     "should download and write files using HTTP" >> {
-      val fileResource = models.HttpFileResource("unec.edu.az/application/uploads/2014/12/pdf-sample.pdf")
+      val fileResource = models.HttpFileResource("localhost:20000/test/http-file.pdf")
       fileResource.write("target/tmp")
       Thread.sleep(500)
-      new File("target/tmp/pdf-sample.pdf").exists() mustEqual true
+      new File("target/tmp/http-file.pdf").exists() mustEqual true
     }
 
     "should not download partial files using HTTP" >> {
@@ -72,6 +77,26 @@ class ResourceIntegrationSpec extends Specification with BeforeAfterAll {
     if(!tmpDirectory.exists()) tmpDirectory.mkdir()
     else tmpDirectory.listFiles().map(_.delete())
 
+    class MockRequestHandler extends HttpHandler {
+      override def handle(t: HttpExchange) = {
+        val h = t.getResponseHeaders
+        h.add("Content-Type", "application/pdf")
+        val file = new File ("src/test/resources/http-file.pdf")
+        val byteArray = new Array[Byte](file.length.toInt)
+        val inputStream = new FileInputStream(file)
+        val bufferedInputStream = new BufferedInputStream(inputStream)
+        bufferedInputStream.read(byteArray, 0, byteArray.length)
+        t.sendResponseHeaders(200, file.length())
+        val os = t.getResponseBody
+        os.write(byteArray, 0, byteArray.length)
+        os.close()
+      }
+    }
+
+    fakeHttpServer.createContext("/test/http-file.pdf", new MockRequestHandler())
+    fakeHttpServer.setExecutor(null)
+    fakeHttpServer.start()
+
     fakeFtpServer.setServerControlPort(10000)
     fakeFtpServer.addUserAccount(account)
     fileSystem.add(new DirectoryEntry("/data"))
@@ -87,5 +112,6 @@ class ResourceIntegrationSpec extends Specification with BeforeAfterAll {
       tmpDirectory.delete()
     }
     fakeFtpServer.stop()
+    fakeHttpServer.stop(0)
   }
 }
