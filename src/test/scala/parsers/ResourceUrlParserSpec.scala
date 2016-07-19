@@ -24,6 +24,10 @@ class ResourceUrlParserSpec extends Specification {
       resourceParser.parse("http://some/file/url")  mustEqual HttpFileResource("some/file/url")
     }
 
+    "should parse https resource" >> {
+      resourceParser.parse("https://some/file/url")  mustEqual HttpFileResource("some/file/url")
+    }
+
     "should throw exception for malformed CanvasCreate command" >> {
       resourceParser.parse("bad url") must throwA[ParseException]
     }

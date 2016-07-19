@@ -10,7 +10,10 @@ class SdfIO {
   }
 
   def getUrls = {
-    println("Enter the comma separated resource urls you want to download followed by enter.")
+    println(
+      """
+        |Enter the comma separated resource urls you want to download followed by enter.
+        """.stripMargin)
     scala.io.StdIn.readLine().split(",").map(_.trim).toList
   }
 
